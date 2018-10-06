@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cm.DisSale.mapper.ProductMapper">
+	<resultMap type="com.cm.DisSale.pojo.Product" id="ProductMap">
+		<id column="product_id" property="productId" />
+		<result column="product_name" property="productName" />
+		<result column="product_num" property="productNum" />
+		<result column="product_size" property="productSize" />
+		<result column="product_price" property="productPrice" />
+		<result column="product_desc" property="productDesc" />
+		<association property="productCategory"
+			column="product_category"
+			javaType="com.cm.DisSale.pojo.ProductCategory">
+			<id column="product_category_id" property="productCategoryId" />
+			<result column="product_category_name"
+				property="productCategoryName" />
+		</association>
+	</resultMap>
+
+	<select id="queryProductList" resultMap="ProductMap">
+		select
+		p.product_id,p.product_name,p.product_num,p.product_size,p.product_price,pc.product_category_name,p.product_desc
+		from product p
+		left join product_category pc on
+		p.product_category=pc.product_category_id
+		<where>
+			<if test="productCondition.productName != null">
+				and p.product_name like
+				'%${productCondition.poductName}%'
+			</if>
+			<if
+				test="productCondition.productCategory!=null and productCondition.productCategory.productCategoryId!=null">
+				and
+				p.product_category=#{productCondition.productCategory.productCategoryId}
+			</if>
+		</where>
+		ORDER BY p.product_id ASC
+		LIMIT #{rowIndex},#{pageSize};
+	</select>
+	<select id="queryProductCount" resultType="int">
+		SELECT
+		count(1)
+		FROM product
+		<where>
+			<if test="productCondition.productName != null">
+				and product_name like
+				'%${productCondition.productName}%'
+			</if>
+			<if
+				test="productCondition.productCategory!=null and productCondition.productCategory.productCategoryId!=null">
+				and
+				product_category=#{productCondition.productCategory.productCategoryId}
+			</if>
+		</where>
+		ORDER BY product_id ASC
+	</select>
+	<select id="queryProductById"
+		resultType="com.cm.DisSale.pojo.Product">
+		select * from product where product_id=#{id}
+	</select>
+	<update id="updateProduct"
+		parameterType="com.cm.DisSale.pojo.Product"
+		keyProperty="product_id" useGeneratedKeys="true">
+		UPDATE product
+		<set>
+			<if test="productName != null">product_name=#{productName},</if>
+			<if test="productNum != null">product_num=#{productNum},</if>
+			<if test="productSize != null">product_size=#{productSize},</if>
+			<if test="productPrice != null">product_price=#{productPrice},</if>
+			<if test="productDesc != null">product_desc=#{productDesc},</if>
+			<if
+				test="productCategory != null
+				 and productCategory.productCategoryId != null">
+				product_category=#{productCategory.productCategoryId}
+			</if>
+		</set>
+		WHERE product_id = #{productId}
+	</update>
+	<insert id="insertProduct" parameterType="com.cm.DisSale.pojo.Product"
+		useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
+		INSERT INTO
+		product(product_name,product_num,product_size,product_price,product_category,product_desc)
+		VALUES
+		(#{productName},#{productNum},#{productSize},#{productPrice},#{productCategory.productCategoryId},#{productDesc})
+	</insert>
+</mapper>

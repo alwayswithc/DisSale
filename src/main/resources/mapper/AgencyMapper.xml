@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cm.DisSale.mapper.AgencyMapper">
+	<select id="listAuthAgency"
+		resultType="com.cm.DisSale.pojo.Agency">
+		select * from agency where auth_code not in ('未授权')
+	</select>
+	<select id="listNoauthAgency"
+		resultType="com.cm.DisSale.pojo.Agency">
+		select * from agency where auth_code='未授权'
+	</select>
+	<select id="listAllAgency"
+		resultType="com.cm.DisSale.pojo.Agency">
+		select * from agency 
+	</select>
+	<insert id="updateAuthCode">
+	 	update agency SET auth_code=#{code} where agency_id=#{id};
+	</insert>
+</mapper>
