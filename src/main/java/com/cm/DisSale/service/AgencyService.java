@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.cm.DisSale.dto.AgencyExecution;
 import com.cm.DisSale.pojo.Agency;
 
 public interface AgencyService {
@@ -19,5 +20,7 @@ public interface AgencyService {
 
 	// 插入授权码
 	int updateAuthCode(int id, String code);
-
+	
+	//注册一级经销商
+	AgencyExecution insertStairAgency(Agency agency);
 }

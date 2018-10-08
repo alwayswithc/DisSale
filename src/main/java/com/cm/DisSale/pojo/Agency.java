@@ -71,9 +71,12 @@ public class Agency implements Serializable {
     /**
      * 1,2对应一级二级经销商
      */
+    //等级
     private Integer agencyLevel;
+    //注册时间
     private Date registTime;
     private String agencyAddress;
     private Integer higherAgencyId;
+    //认证码
     private String authCode;
 }

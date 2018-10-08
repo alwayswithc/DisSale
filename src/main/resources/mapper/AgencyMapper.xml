@@ -16,4 +16,12 @@
 	<insert id="updateAuthCode">
 	 	update agency SET auth_code=#{code} where agency_id=#{id};
 	</insert>
+	<insert id="insertStairAgency" parameterType="com.cm.DisSale.pojo.Agency"
+		useGeneratedKeys="true" keyProperty="agencyId" keyColumn="agency_id">
+		INSERT
+		INTO
+		agency(agency_name,agency_password,phone,agency_level,regist_time,agency_address)
+		VALUES
+		(#{agencyName},#{agencyPassword},#{phone},#{agencyLevel},#{registTime},#{agencyAddress})
+	</insert>
 </mapper>
