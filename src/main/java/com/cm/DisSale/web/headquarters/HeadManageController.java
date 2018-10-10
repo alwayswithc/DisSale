@@ -48,13 +48,30 @@ public class HeadManageController {
 	}
 	@PostMapping("/givecode")
 	public ModelMap giveCode(HttpServletRequest request){
-		System.out.println("=================================");
+		String code=null;
 		Integer id=Integer.valueOf(request.getParameter("id"));
-		String code=request.getParameter("code");
+		Agency agency=agencyService.queryAgencyById(id);
+		//判断是不是一级经销商，是的话给三位数授权码
+		if(agency.getAgencyLevel()==1) {
+			int i=(int)(Math.random()*900)+100;
+			code=String.valueOf(i);	
+		}else {
+			//获取上级经销商id
+			int higherAgencyid=agency.getHigherAgencyId();
+			//根据上级经销商id得到上级经销商对象
+			Agency higherAgency=agencyService.queryAgencyById(higherAgencyid);
+			//获取上级经销商的授权码
+			String higherAgencyCode=higherAgency.getAuthCode();
+			int i=(int)(Math.random()*900)+100;
+			String tempcode=String.valueOf(i);	
+			code=higherAgencyCode+"."+tempcode;
+		}
 		agencyService.updateAuthCode(id, code);
 		ModelMap map=new ModelMap();
+		map.addAttribute("code", code);
 		map.addAttribute("success", true);
 		return map;	
 	}
-
+	 
+	
 }

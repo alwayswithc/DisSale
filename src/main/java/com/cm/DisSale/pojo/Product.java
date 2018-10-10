@@ -13,6 +13,7 @@ public class Product implements Serializable{
 	private Integer productSize;
 	private Double productPrice;
 	private String productDesc;
+	private String simg;// 简略图
 	private ProductCategory productCategory;
 	private List<ProductImg> productImgList;
 	public int getProductId() {
@@ -66,6 +67,12 @@ public class Product implements Serializable{
 	}
 	public void setProductImgList(List<ProductImg> productImgList) {
 		this.productImgList = productImgList;
+	}
+	public String getSimg() {
+		return simg;
+	}
+	public void setSimg(String simg) {
+		this.simg = simg;
 	}
 	
 

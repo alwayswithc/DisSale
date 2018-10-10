@@ -3,8 +3,8 @@
  */
 $(function() {
 	var getProductCountUrl = '/DisSale/product/count';
-	var getProductCategorylist = '/DisSale/product/categoryList'
-
+	var getProductCategorylist = '/DisSale/product/categoryList';
+    var deleteUrl='/DisSale/product/delete';
 		
 	// 获取页码数
 	getPageCount();
@@ -49,5 +49,7 @@ $(function() {
 			}
 		});
 	}
+	 
+	
 
 });

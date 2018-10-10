@@ -47,11 +47,8 @@
 				<span class="glyphicon glyphicon-forward"></span>
 			</button>
 			<br> <br>
-			<div class="input-group" id="inputgroup" style="visibility: hidden;">
-				<input type="text" class="form-control" placeholder="请输入三位数的授权码"
-					aria-describedby="basic-addon2" id="code"> <span
-					class="input-group-addon" id="submit">提交</span>
-			</div>
+				 <span id="code"></span>
+			
 		</div>
 </body>
 </html>

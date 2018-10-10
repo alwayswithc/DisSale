@@ -1,6 +1,8 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,10 +33,8 @@
 	src='../resources/js/jquery-1.11.2.min.js' charset='utf-8'></script>
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg navbar-light bg-dark">
-		<a class="navbar-brand" href="javascript:history.back(-1)"
-			style="color: gray">返回</a>
-
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="/DisSale/headadmin/index">返回</a>
 	</nav>
 	<img src="../resources/img/8cba839df501e0448f3ecbbc1b060ded.jpg"
 		class="img-fluid" alt="Responsive image">
@@ -45,7 +45,12 @@
 		<input class="form-control mr-sm-2" type="search" placeholder="Search"
 			name="queryName">
 		<button class="btn btn-outline-success my-2 my-sm-0 btn-success"
-			type="submit">Search</button>
+			type="submit">搜索</button>
+		&nbsp;&nbsp;&nbsp;
+		<button class="btn btn-outline-success  btn-default" type="submit">
+			<a href="/DisSale/productadmin/edit">增加商品</a>
+		</button>
+
 	</form>
 	<br>
 	<div id="searchDiv" style="margin-left: 10px"></div>
@@ -71,7 +76,11 @@
 					<td>${p.productSize}</td>
 					<td>${p.productPrice}</td>
 					<td>${p.productCategory.productCategoryName}</td>
-					<td><a href="/DisSale/productadmin/modify?productId="+${p.productId} >编辑</a> <a href="#">删除</a></td>
+					<td><a href="/DisSale/productadmin/edit?productId=${p.productId}">编辑</a>
+					<a href="#" onclick="deleteProduct(${p.productId})">删除</a>
+					<a href="/DisSale/productadmin/detail?productId=${p.productId}">预览</a>
+					</td>
+						
 				</tr>
 			</c:forEach>
 		</tbody>
@@ -89,6 +98,13 @@
 
 		</ul>
 	</nav>
-
+ <script type="text/javascript">
+ 	function deleteProduct(id){
+ 		if(confirm("是否确认要删除此商品？")){
+ 			location.href="/DisSale/product/delete?productId="+id;
+ 		}
+ 			
+ 	}
+ </script>
 </body>
 </html>

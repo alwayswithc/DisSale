@@ -32,11 +32,10 @@ import com.cm.DisSale.util.CodeUtil;
 import com.cm.DisSale.util.HttpServletRequestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 @Controller
 @RequestMapping("/product")
 public class ProductManageController {
-	private static final int IMAGEMAXCOUNT = 0;
+	private static final int IMAGEMAXCOUNT = 6;
 	@Autowired
 	ProductService productService;
 	@Autowired
@@ -120,7 +119,7 @@ public class ProductManageController {
 		mv.setViewName("/head/productlist");
 		return mv;
 	}
-	
+
 	@PostMapping("/modify")
 	@ResponseBody
 	public ModelMap modifyProduct(HttpServletRequest request) {
@@ -134,13 +133,14 @@ public class ProductManageController {
 		// 接收前端参数的变量的初始化，包括商品，缩略图，详情图列表实体类
 		ObjectMapper mapper = new ObjectMapper();
 		Product product = null;
+		ImageHolder thumbnail = null;
 		List<ImageHolder> productImgList = new ArrayList<ImageHolder>();
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(
 				request.getSession().getServletContext());
 		// 若请求中存在文件流，则取出相关的文件（包括缩略图和详情图）
 		try {
 			if (multipartResolver.isMultipart(request)) {
-				 handleImage(request, productImgList);
+				thumbnail = handleImage(request, thumbnail, productImgList);
 			}
 		} catch (Exception e) {
 			modelMap.put("success", false);
@@ -160,8 +160,8 @@ public class ProductManageController {
 		if (product != null) {
 			try {
 				// 开始进行商品信息变更操作
-				productService.modifyProduct(product, productImgList);
-		        modelMap.put("success", true);
+				productService.modifyProduct(product, thumbnail, productImgList);
+				modelMap.put("success", true);
 			} catch (RuntimeException e) {
 				modelMap.put("success", false);
 				modelMap.put("errMsg", e.toString());
@@ -172,11 +172,13 @@ public class ProductManageController {
 			modelMap.put("errMsg", "请输入商品信息");
 		}
 		return modelMap;
-		
+
 	}
+
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	@ResponseBody
 	private Map<String, Object> addProduct(HttpServletRequest request) {
+
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		// 验证码校验
 		if (!CodeUtil.checkVerifyCode(request)) {
@@ -184,7 +186,7 @@ public class ProductManageController {
 			modelMap.put("errMsg", "输入了错误的验证码");
 			return modelMap;
 		}
-		// 接收前端参数的变量的初始化，包括商品，缩略图，详情图列表实体类
+		// 接收前端参数的变量的初始化，包括商品，详情图列表实体类
 		ObjectMapper mapper = new ObjectMapper();
 		Product product = null;
 		ImageHolder thumbnail = null;
@@ -194,7 +196,7 @@ public class ProductManageController {
 		try {
 			// 若请求中存在文件流，则取出相关的文件（包括缩略图和详情图）
 			if (multipartResolver.isMultipart(request)) {
-				 handleImage(request, productImgList);
+				thumbnail = handleImage(request, thumbnail, productImgList);
 			} else {
 				modelMap.put("success", false);
 				modelMap.put("errMsg", "上传图片不能为空");
@@ -214,11 +216,11 @@ public class ProductManageController {
 			modelMap.put("errMsg", e.toString());
 			return modelMap;
 		}
-		// 若Product信息，缩略图以及详情图列表为非空，则开始进行商品添加操作
+		// 若Product信息，以及详情图列表为非空，则开始进行商品添加操作
 		if (product != null && productImgList.size() > 0) {
 			try {
 				// 执行添加操作
-				productService.addProduct(product, productImgList);
+				productService.addProduct(product, thumbnail, productImgList);
 				modelMap.put("success", true);
 			} catch (ProductOperationException e) {
 				modelMap.put("success", false);
@@ -231,15 +233,15 @@ public class ProductManageController {
 		}
 		return modelMap;
 	}
-	
+
 	@GetMapping("/getproductbyid")
 	@ResponseBody
 	public ModelMap getProductById(HttpServletRequest request) {
-		ModelMap map=new ModelMap();
-		String id=request.getParameter("productId");
-		if(StringUtils.isNotBlank(id)) {
-			int productid=Integer.valueOf(id);
-			Product p=productService.getProductById(productid);
+		ModelMap map = new ModelMap();
+		String id = request.getParameter("productId");
+		if (StringUtils.isNotBlank(id)) {
+			int productid = Integer.valueOf(id);
+			Product p = productService.getProductById(productid);
 			List<ProductCategory> productCategoryList = productCategoryService.getProductCategoryList();
 			map.addAttribute("categoryList", productCategoryList);
 			map.addAttribute("product", p);
@@ -247,12 +249,17 @@ public class ProductManageController {
 			return map;
 		}
 		map.addAttribute("success", false);
-		return map;	
+		return map;
 	}
-	
-	private void handleImage(HttpServletRequest request, List<ImageHolder> productImgList)
+
+	private ImageHolder handleImage(HttpServletRequest request, ImageHolder thumbnail, List<ImageHolder> productImgList)
 			throws IOException {
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		// 取出缩略图并构建ImageHolder对象
+		CommonsMultipartFile thumbnailFile = (CommonsMultipartFile) multipartRequest.getFile("thumbnail");
+		if (thumbnailFile != null) {
+			thumbnail = new ImageHolder(thumbnailFile.getOriginalFilename(), thumbnailFile.getInputStream());
+		}
 		// 取出详情图列表并构建List<ImageHolder>列表对象，最多支持六张图片上传
 		for (int i = 0; i < IMAGEMAXCOUNT; i++) {
 			CommonsMultipartFile productImgFile = (CommonsMultipartFile) multipartRequest.getFile("productImg" + i);
@@ -266,6 +273,38 @@ public class ProductManageController {
 				break;
 			}
 		}
+		return thumbnail;
 	}
 
+	// 商品删除
+	@GetMapping("/delete")
+	public String deleteProduct(HttpServletRequest request) {
+		String id = request.getParameter("productId");
+		if (StringUtils.isNotBlank(id)) {
+			int productid = Integer.valueOf(id);
+			productService.deleteProduct(productid);
+		}
+		return "forward:/product/list";
+
+	}
+    @GetMapping("/getProductDetail")
+    @ResponseBody
+	private Map<String, Object> ProductDetailInfo(HttpServletRequest request) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		// 获取前台传递过来的productId
+		String productId=request.getParameter("productId");
+		int productid=Integer.valueOf(productId);
+		Product product = null;
+		// 空值判断
+		if (productid != -1) {
+			// 根据productId获取商品信息，包含商品详情图列表
+			product = productService.queryProductDetailById(productid);
+			modelMap.put("product", product);
+			modelMap.put("success", true);
+		} else {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", "empty productId");
+		}
+		return modelMap;
+	}
 }

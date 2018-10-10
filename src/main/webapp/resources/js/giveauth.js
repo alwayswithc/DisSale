@@ -19,25 +19,21 @@ $(function() {
 						}
 					});
 	$('#go').click(function() {
-		$("#inputgroup").css('visibility', 'visible');// 元素显示
-	});
-	$('#submit').click(function() {
 		var id = getQueryString('id');
-		var code = $('#code').val();
 		$.ajax({
 			url : giveCodeUrl,
 			type : 'POST',
 			dataType : "json",
 			data :{
 				id:id,
-				code:code,
 			},
-			success : function(data) {
-				if (data.success) {
-					alert("授权成功！")
-				}
-			}
+		    success : function(data) {
+			    if (data.success) {
+			    	$('#code').text("成功授权，授权码为:"+data.code);
+			    }
+			},
 		});
 	});
+	
 		
 });

@@ -88,7 +88,19 @@
 						</div>
 					</div>
 				</li>
-				
+				<li>
+					<div class="item-content">
+						<div class="item-media">
+							<i class="icon icon-form-email"></i>
+						</div>
+						<div class="item-inner">
+							<div class="item-title label">缩略图</div>
+							<div class="item-input">
+								<input type="file" id="small-img">
+							</div>
+						</div>
+					</div>
+				</li>
 				<li>
 					<div class="item-content">
 						<div class="item-media">
@@ -158,7 +170,7 @@
 	<script type='text/javascript'
 		src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
 	<script type='text/javascript'
-		src='../resources/js/common/commonutil.js' charset='utf-8'></script>
+		src='../resources/js/commonutil.js' charset='utf-8'></script>
 	<script type='text/javascript'
 		src='../resources/js/productedit.js' charset='utf-8'></script>
 </body>

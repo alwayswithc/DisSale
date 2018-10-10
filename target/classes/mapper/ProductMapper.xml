@@ -8,6 +8,7 @@
 		<result column="product_size" property="productSize" />
 		<result column="product_price" property="productPrice" />
 		<result column="product_desc" property="productDesc" />
+		<result column="simg" property="simg" />
 		<association property="productCategory"
 			column="product_category"
 			javaType="com.cm.DisSale.pojo.ProductCategory">
@@ -15,6 +16,12 @@
 			<result column="product_category_name"
 				property="productCategoryName" />
 		</association>
+		<collection property="productImgList" column="product_id"
+			ofType="com.cm.DisSale.pojo.ProductImg">
+			<id column="product_img_id" property="productImgId" />
+			<result column="img_addr" property="imgAddr" />
+			<result column="product_id" property="productId" />
+		</collection>
 	</resultMap>
 
 	<select id="queryProductList" resultMap="ProductMap">
@@ -54,13 +61,10 @@
 		</where>
 		ORDER BY product_id ASC
 	</select>
-	<select id="queryProductById"
-		resultType="com.cm.DisSale.pojo.Product">
-		select * from product where product_id=#{id}
-	</select>
+
 	<update id="updateProduct"
-		parameterType="com.cm.DisSale.pojo.Product"
-		keyProperty="product_id" useGeneratedKeys="true">
+		parameterType="com.cm.DisSale.pojo.Product" keyProperty="product_id"
+		useGeneratedKeys="true">
 		UPDATE product
 		<set>
 			<if test="productName != null">product_name=#{productName},</if>
@@ -68,6 +72,7 @@
 			<if test="productSize != null">product_size=#{productSize},</if>
 			<if test="productPrice != null">product_price=#{productPrice},</if>
 			<if test="productDesc != null">product_desc=#{productDesc},</if>
+			<if test="simg!= null">simg=#{simg},</if>
 			<if
 				test="productCategory != null
 				 and productCategory.productCategoryId != null">
@@ -76,11 +81,45 @@
 		</set>
 		WHERE product_id = #{productId}
 	</update>
-	<insert id="insertProduct" parameterType="com.cm.DisSale.pojo.Product"
-		useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
+	<insert id="insertProduct"
+		parameterType="com.cm.DisSale.pojo.Product" useGeneratedKeys="true"
+		keyProperty="productId" keyColumn="product_id">
 		INSERT INTO
-		product(product_name,product_num,product_size,product_price,product_category,product_desc)
+		product(product_name,product_num,product_size,product_price,product_category,product_desc,simg)
 		VALUES
-		(#{productName},#{productNum},#{productSize},#{productPrice},#{productCategory.productCategoryId},#{productDesc})
+		(#{productName},#{productNum},#{productSize},#{productPrice},#{productCategory.productCategoryId},#{productDesc},#{simg})
 	</insert>
+	<select id="queryProductById" resultMap="ProductMap">
+		select
+		p.product_id,p.product_name,p.product_num,p.product_size,p.product_price,pc.product_category_id,pc.product_category_name,p.product_desc,p.simg
+		from product p left join product_category pc on
+		p.product_category=pc.product_category_id
+		where product_id =
+		#{productId}
+	</select>
+	<select id="queryProductDetailById" resultMap="ProductMap">
+		SELECT
+		product.product_id,
+		product.product_name,
+		product.product_desc,
+		product.simg,
+		product.product_price,
+		product.product_category,
+		product_img.product_img_id,
+		product_img.img_addr
+		FROM
+		product JOIN
+		product_img
+		on product.product_id = product_img.product_id
+		WHERE
+		product.product_id = #{productId}
+
+	</select>
+	<delete id="deleteProduct">
+		DELETE FROM
+		product
+		WHERE
+		product_id =
+		#{productId}
+	</delete>
 </mapper>

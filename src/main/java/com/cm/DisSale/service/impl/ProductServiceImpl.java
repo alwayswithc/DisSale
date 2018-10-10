@@ -48,9 +48,19 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	@Transactional
-	public void modifyProduct(Product product, List<ImageHolder> productImgHolderList) {
+	public void modifyProduct(Product product, ImageHolder thumbnail, List<ImageHolder> productImgHolderList) {
 		// 空值判断
 		if (product != null) {
+			// 若商品缩略图不为空且原有缩略图不为空则删除原有缩略图并添加
+			if (thumbnail != null) {
+				// 先获取一遍原有信息，因为原来的信息里有原图片地址
+				Product tempProduct = productMapper.queryProductById(product.getProductId());
+				
+				if (tempProduct.getSimg() != null) {
+					ImageUtil.deleteFileOrPath(tempProduct.getSimg());
+				}
+				addThumbnail(product, thumbnail);
+			}
 			// 如果有新存入的商品详情图，则将原先的删除，并添加新的图片
 			if (productImgHolderList != null && productImgHolderList.size() > 0) {
 				deleteProductImgList(product.getProductId());
@@ -70,7 +80,11 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Transactional
-	public void addProduct(Product product, List<ImageHolder> productImgHolderList) {
+	public void addProduct(Product product, ImageHolder thumbnail,List<ImageHolder> productImgHolderList) {
+		// 若商品缩略图不为空则添加
+		if (thumbnail != null) {
+			addThumbnail(product, thumbnail);
+		}
 		try {
 			// 创建商品信息
 			int effectedNum = productMapper.insertProduct(product);
@@ -84,7 +98,19 @@ public class ProductServiceImpl implements ProductService {
 		if (productImgHolderList != null && productImgHolderList.size() > 0) {
 			addProductImgList(product, productImgHolderList);
 		}
-		
+
+	}
+
+	/**
+	 * 添加缩略图
+	 * 
+	 * @param product
+	 * @param thumbnail
+	 */
+	private void addThumbnail(Product product, ImageHolder thumbnail) {
+		String dest = PathUtil.getProductImagePath(product.getProductName());
+		String thumbnailAddr = ImageUtil.generateThumbnail(thumbnail, dest);
+		product.setSimg(thumbnailAddr);
 	}
 
 	/**
@@ -94,8 +120,9 @@ public class ProductServiceImpl implements ProductService {
 	 * @param productImgHolderList
 	 */
 	private void addProductImgList(Product product, List<ImageHolder> productImgHolderList) {
+
 		// 获取图片存储路径，这里直接存放到相应商品的文件夹底下
-		String dest = PathUtil.getProductImagePath(product.getProductId());
+		String dest = PathUtil.getProductImagePath(product.getProductName());
 		List<ProductImg> productImgList = new ArrayList<ProductImg>();
 		// 遍历图片一次去处理，并添加进productImg实体类里
 		for (ImageHolder productImgHolder : productImgHolderList) {
@@ -133,5 +160,34 @@ public class ProductServiceImpl implements ProductService {
 		// 删除数据库里原有图片的信息
 		productImgMapper.deleteProductImgByProductId(productId);
 	}
+
+	@Override
+	@Transactional
+	public void deleteProduct(int productId) {
+		if(productId>0) {
+			// 先获取一遍原有信息，因为原来的信息里有原图片地址
+			Product tempProduct = productMapper.queryProductById(productId);
+			
+			if (tempProduct.getSimg() != null) {
+				ImageUtil.deleteFileOrPath(tempProduct.getSimg());
+			}
+			//删掉详情图文件
+			deleteProductImgList(productId) ;
+			try {
+				int effectedNum = productMapper.deleteProduct(productId);
+				if (effectedNum <= 0) {
+					throw new ProductOperationException("删除商品失败");
+				}
+			} catch (Exception e) {
+				throw new ProductOperationException("删除商品失败:" + e.toString());
+			}
+		}
+	}
+
+	@Override
+	public Product queryProductDetailById(int productId) {
+		return productMapper.queryProductDetailById(productId);
+	}
+		
 
 }

@@ -32,7 +32,7 @@
 		class="img-fluid" alt="Responsive image">
 	<br>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<a class="navbar-brand" href=""javascript :history.back(-1)">返回</a>
+		<a class="navbar-brand" href="/DisSale/headadmin/index">返回</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse"
 			data-target="#navbarTogglerDemo02"
 			aria-controls="navbarTogglerDemo02" aria-expanded="false" 

@@ -8,7 +8,7 @@ $(function() {
 		getInfo(productId);
 		isEdit = true;
 	} else {
-		getCategory(shopId);
+		getCategory(); 
 		productPostUrl = '/DisSale/product/add';
 	}
 
@@ -24,8 +24,8 @@ $(function() {
 								$('#product-size').val(product.productSize);
 								$('#price').val(product.productPrice);
 							
-								var optionHtml = '';
-								var optionArr = data.productCategoryList;
+								var optionHtml = ''; 
+								var optionArr = data.categoryList;
 								var optionSelected = product.productCategory.productCategoryId;
 								optionArr
 										.map(function(item, index) {
@@ -47,7 +47,7 @@ $(function() {
 	function getCategory() {
 		$.getJSON(categoryUrl, function(data) {
 			if (data.success) {
-				var productCategoryList = data.productCategoryList;
+				var productCategoryList = data.categoryList;
 				var optionHtml = '';
 				productCategoryList.map(function(item, index) {
 					optionHtml += '<option data-value="'
@@ -68,6 +68,8 @@ $(function() {
 	$('#submit').click(
 			function() {
 				var product = {};
+				
+			    product.productId = productId;
 				product.productName = $('#product-name').val();
 				product.productDesc = $('#product-desc').val();
 				product.productNum = $('#product-num').val();
@@ -79,8 +81,6 @@ $(function() {
 								return !this.selected;
 							}).data('value')
 				};
-				product.productId = productId;
-
 				var thumbnail = $('#small-img')[0].files[0];
 				console.log(thumbnail);
 				var formData = new FormData();

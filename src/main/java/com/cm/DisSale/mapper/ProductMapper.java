@@ -28,19 +28,25 @@ public interface ProductMapper {
 	 */
 	int queryProductCount(@Param("productCondition") Product product);
 	
-	/**
+	 /**
 	  *  根据id获取商品信息
-	 *  @param productId
-	 *  @return Product
-	 */
+	  *  @param productId
+	  *  @return Product
+	  */
 	Product queryProductById(int productId);
-	/**
-	 * 
-	   *    修改商品信息
-	 *   @param Product
-	 */ 
+	 /**
+	  * 
+	  *    修改商品信息
+	  *   @param Product
+	  */ 
 	int updateProduct(Product product);
 	
 	int insertProduct(Product product);
-
+	
+	int deleteProduct(int productId);
+	
+	/**
+	 * 用于商品详情页根据id查找商品信息和详情图
+	 */
+	Product queryProductDetailById(int productId);
 }

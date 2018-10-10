@@ -13,7 +13,7 @@ public class HeadAdminController {
 	}
 	@GetMapping("/agencylist")
 	public String agencyList(){
-		return "/head/agencyList";
+		return "/head/agencymanage";
 	}
 	@GetMapping("/giveauth")
 	public String giveAuth(){

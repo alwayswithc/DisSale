@@ -15,8 +15,8 @@ public class PathUtil {
 		return basePath;
 	}
 
-	public static String getProductImagePath(int productId) {
-		String imagePath = "/upload/product/" + productId + "/";
+	public static String getProductImagePath(String productName) {
+		String imagePath = "/upload/product/" + productName + "/";
 		return imagePath.replace("/", seperator);
 	}
 }
